@@ -1,5 +1,5 @@
 const Contact = require("../models/Contact");
-const transporter = require("../config/mail");
+const tranEmailApi = require("../config/mail");
 
 exports.submitContactForm = async (req, res) => {
     try {
@@ -20,39 +20,53 @@ exports.submitContactForm = async (req, res) => {
         // ============================
         // Email to YOU
         // ============================
-        await transporter.sendMail({
-            from: `"Portfolio Contact" <${process.env.MAIL_USER}>`,
-            to: process.env.MAIL_USER,
-            subject: `New Contact Form Submission - ${name}`,
-            html: `
+       await tranEmailApi.sendTransacEmail({
+      sender: {
+        email: process.env.MAIL_SENDER,
+        name: "Portfolio Contact",
+      },
+      to: [
+        {
+          email: process.env.MAIL_SENDER,
+        },
+      ],
+      subject: `New Contact Form Submission - ${name}`,
+      htmlContent: `
         <h2>New Contact Form Message</h2>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone}</p>
         <p><strong>Company Name:</strong> ${companyName || "N/A"}</p>
         <p><strong>Company Website:</strong> ${companyWebsite || "N/A"}</p>
-        <p><strong>Message:</strong><br> ${message}</p>
+        <p><strong>Message:</strong><br/> ${message}</p>
       `,
-        });
+    });
 
-        // ============================
-        // Auto-response to USER
-        // ============================
-        await transporter.sendMail({
-            from: `"Sachin Portfolio" <${process.env.MAIL_USER}>`,
-            to: email,
-            subject: "Thank you for contacting me!",
-            html: `
+    // =========================
+    // Auto-reply to USER
+    // =========================
+    await tranEmailApi.sendTransacEmail({
+      sender: {
+        email: process.env.MAIL_SENDER,
+        name: "Sachin Portfolio",
+      },
+      to: [
+        {
+          email,
+        },
+      ],
+      subject: "Thank you for contacting me!",
+      htmlContent: `
         <h3>Hello ${name},</h3>
         <p>Thank you for reaching out!</p>
-        <p>I have received your message and will get back to you as soon as possible.</p>
+        <p>I’ve received your message and will get back to you shortly.</p>
         <br/>
         <p>Best Regards,</p>
         <strong>Sachin M</strong>
       `,
-        });
+    });
 
-        res.status(201).json({ message: "Message sent successfully!" });
+    res.status(201).json({ message: "Message sent successfully!" });
 
     } catch (error) {
         console.error("CONTACT FORM ERROR:", error);
