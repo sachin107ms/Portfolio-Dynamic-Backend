@@ -57,7 +57,7 @@ exports.submitContactForm = async (req, res) => {
     } catch (error) {
         console.error("CONTACT FORM ERROR:", error);
         res.status(500).json({
-            message: "Something went wrong while sending the message.",
+            message: error.message || "Something went wrong while sending the message.",
         });
     }
 };
