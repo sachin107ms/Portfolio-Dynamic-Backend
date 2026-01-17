@@ -10,4 +10,4 @@ jobs:
     steps:
       - name: Ping Express backend
         run: |
-          curl -X GET http://localhost/5000/health
+          curl -X GET https://portfolio-dynamic-backend.onrender.com/health
